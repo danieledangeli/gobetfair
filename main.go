@@ -3,10 +3,15 @@ package main
 import (
 	"fmt"
 	"github.com/danieledangeli/gobetfair/config"
+	"log"
 )
 
 func main() {
-	s := config.GetConfig()
-	fmt.Println(s.Credential.BetfairPassword)
+	config, err := config.GetConfig("config/conf_correct.yml")
+
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+	fmt.Println(config)
 }
 

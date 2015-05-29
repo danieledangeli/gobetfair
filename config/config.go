@@ -2,30 +2,33 @@ package config
 
 import (
 	"gopkg.in/yaml.v2"
-	"log"
 	"github.com/danieledangeli/gobetfair/credential"
+	"io/ioutil"
 )
 
-var data = `
-apiEndpoint: www.google.com
-loginEndpoint: www.login.com
-credential:
-  betfairUsername: username
-  betfairPassword: password
-`
 type Config struct {
 	ApiEndpoint string `yaml:"apiEndpoint"`
 	LoginEndpoint string `yaml:"loginEndpoint"`
 	Credential credential.Credential `yaml:"credential"`
 }
 
-func GetConfig() (Config) {
-	config := Config{}
-	err := yaml.Unmarshal([]byte(data), &config)
+func GetConfig(filepath string) (Config, error) {
+
+	yamlFileByteArray, err := getYamlFile(filepath)
 
 	if err != nil {
-		log.Fatalf("error: %v", err)
+		return Config{},err
 	}
 
-	return config
+	return unmarshalFileByteArrayIntoConfig(yamlFileByteArray)
+}
+
+func getYamlFile(filepath string) ([]byte, error) {
+	return ioutil.ReadFile(filepath)
+}
+
+func unmarshalFileByteArrayIntoConfig(yamlFileByteArray []byte) (Config, error) {
+	config := Config{}
+	err := yaml.Unmarshal(yamlFileByteArray, &config)
+	return config, err
 }

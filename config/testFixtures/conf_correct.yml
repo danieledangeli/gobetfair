@@ -1,0 +1,5 @@
+apiEndpoint: www.google.com
+loginEndpoint: www.login.com
+credential:
+    betfairUsername: username
+    betfairPassword: password
