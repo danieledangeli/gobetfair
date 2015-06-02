@@ -3,3 +3,4 @@ loginEndpoint: www.login.com
 credential:
     betfairUsername: username
     betfairPassword: password
+    applicationKey: appKey

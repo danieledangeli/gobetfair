@@ -4,25 +4,17 @@ import (
 	"fmt"
 	"github.com/danieledangeli/gobetfair/config"
 	"log"
-	"github.com/danieledangeli/gobetfair/apiHelper"
+	"github.com/danieledangeli/gobetfair/session"
 )
 
 func main() {
-	config, err := config.GetConfig("config/conf.yaml.dist")
+	config, err := config.GetConfig("config/conf.yaml")
+	session, err:= session.Login(config.Credential, config.LoginEndpoint)
 
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
 
-	competition := apiHelper.Competition{config}
-
-	params := []string{"leto", "paul", "teg"}
-	response, err := competition.ApiRequest(params)
-
-	if err != nil {
-		log.Fatalf("error: %v", err)
-	}
-
-	fmt.Println(response)
+	fmt.Println(session.Token)
 }
 
