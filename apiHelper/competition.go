@@ -11,10 +11,13 @@ type Competition struct {
 }
 
 func (c Competition) ApiRequest(parameters []string) (response.Response, error) {
+	var resp response.Response
+	
 	resp, err := http.Get("http://example.com/")
 
 	if err != nil {
-		return response.Response{}, err
+		return resp, err
 	}
+	
 	return response.ParseResponse(resp)
 }
