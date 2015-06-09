@@ -7,9 +7,15 @@ import (
 	"io/ioutil"
 )
 
-func DoRequest(request *http.Request) BetfairResponse {
-	hc := http.Client{}
-	response := decodeResponse(hc.Do(request))
+type HttpIOInterface interface {
+	DoRequest(request *http.Request) BetfairResponse
+}
+
+type HttpIO struct {
+	hc *http.Client
+}
+func (httpio *HttpIO) DoRequest(request *http.Request) BetfairResponse {
+	response := decodeResponse(httpio.hc.Do(request))
 	return response
 }
 

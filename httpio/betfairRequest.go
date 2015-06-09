@@ -7,8 +7,17 @@ import (
 	"log"
 )
 
-func CreateLoginRequest(username string, password string, applicationKey string, urlEndpoint string) (*http.Request) {
+// BetfairRequestFactoryInterface must implement this interface
+type BetfairRequestFactoryInterface interface {
+	CreateLoginRequest(username string, password string, applicationKey string, urlEndpoint string) (*http.Request)
+}
+
+type BetfairRequestFactory struct {
+}
+
+func (brf *BetfairRequestFactory) CreateLoginRequest(username string, password string, applicationKey string, urlEndpoint string) (*http.Request) {
 	var buffer bytes.Buffer
+
 	buffer.WriteString("username=")
 	buffer.WriteString(username)
 	buffer.WriteString("&password=")
@@ -16,13 +25,11 @@ func CreateLoginRequest(username string, password string, applicationKey string,
 
 	req, err := http.NewRequest("POST", urlEndpoint, strings.NewReader(buffer.String()))
 
-	//debug(httputil.DumpRequestOut(req, true))
-
 	if err != nil {
 		log.Panic(err)
 	}
 
-	req.Header.Add("X-Application:", applicationKey)
+	req.Header.Add("X-Application", applicationKey)
 	req.Header.Add("Accept","application/json")
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 

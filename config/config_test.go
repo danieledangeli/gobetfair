@@ -6,7 +6,7 @@ import (
 )
 
 func TestItParseYamlFile(t *testing.T) {
-	expectedConfig  := Config{"www.google.com", "www.login.com", credential.Credential{"erlangb88", "annarita05011988", "appKey"}}
+	expectedConfig  := Config{"www.google.com", "www.login.com", credential.Credential{"username", "password", "appKey"}}
 	config, err := GetConfig("testFixtures/conf_correct.yml")
 
 	if err != nil {
