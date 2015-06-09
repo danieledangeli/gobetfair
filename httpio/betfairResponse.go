@@ -2,7 +2,6 @@ package httpio
 
 import (
 	"encoding/json"
-	//"fmt"
 )
 
 type BetfairResponse interface {

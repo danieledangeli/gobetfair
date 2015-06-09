@@ -38,7 +38,6 @@ func TestItLoginAndCreatesAToken(t *testing.T) {
 	}
 }
 
-
 func TestItReturnErrorIdLoginResponseHasErrors(t *testing.T) {
 	httpIO := &MockHttpIo{}
 
@@ -80,7 +79,6 @@ type MockBetfairRequestFactory struct {
 func (s *MockBetfairRequestFactory) CreateLoginRequest(username string, password string, applicationKey string, urlEndpoint string)(*http.Request) {
 	return s.CreateLoginRequestFunc(username, password, applicationKey, urlEndpoint)
 }
-
 
 func (h *MockHttpIo) DoRequest(request *http.Request) httpio.BetfairResponse {
 	return h.DoRequestFunc(request)

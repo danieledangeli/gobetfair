@@ -7,7 +7,6 @@ import (
 	"log"
 )
 
-// BetfairRequestFactoryInterface must implement this interface
 type BetfairRequestFactoryInterface interface {
 	CreateLoginRequest(username string, password string, applicationKey string, urlEndpoint string) (*http.Request)
 }
