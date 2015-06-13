@@ -36,11 +36,3 @@ func decodeResponse(response *http.Response, err error) BetfairResponse {
 
 	return betfairResponse.Decode(contents)
 }
-
-func debug(data []byte, err error) {
-	if err == nil {
-		fmt.Printf("%s\n\n", data)
-	} else {
-		log.Fatalf("%s\n\n", err)
-	}
-}

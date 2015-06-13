@@ -2,6 +2,7 @@ package httpio
 
 import (
 	"testing"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestItDecodeResponseByteDataIntoBetfairResponseObject(t *testing.T) {
@@ -11,32 +12,20 @@ func TestItDecodeResponseByteDataIntoBetfairResponseObject(t *testing.T) {
 	var body = []byte("{\"token\": \"123\", \"Product\": \"product\", \"status\": \"200\", \"error\": \"error\"}")
 	var decodedResponse = response.Decode(body)
 
-	if decodedResponse != expectedDecodedResponse {
-		t.Error("Expected: \n", expectedDecodedResponse, "\n Got: \n",  decodedResponse)
-		t.FailNow()
-	}
+	assert.Equal(t, expectedDecodedResponse, decodedResponse)
 }
 
 func TestItHasErrorsIfPresent(t *testing.T) {
 	loginResponse := BetfairLoginResponse{"123", "product", "404", "error"}
-	if loginResponse.HasError() == false {
-		t.Error("Expected: login Response with errors \n got: \n without")
-		t.FailNow()
-	}
+	assert.True(t, loginResponse.HasError())
 }
 
 func TestItDontHaveErrorsIfNotPresent(t *testing.T) {
 	loginResponse := BetfairLoginResponse{"123", "product", "404", ""}
-	if loginResponse.HasError() {
-		t.Error("Expected: login Response without errors \n got: \n with errors")
-		t.FailNow()
-	}
+	assert.False(t, loginResponse.HasError())
 }
 
 func TestGetErrorItReturnError(t *testing.T) {
 	loginResponse := BetfairLoginResponse{"123", "product", "", "horror error"}
-	if loginResponse.GetError() != "horror error" {
-		t.Error("Expected: horror error \n Got: \n", loginResponse.GetError())
-		t.FailNow()
-	}
+	assert.Equal(t, "horror error", loginResponse.GetError())
 }

@@ -6,6 +6,8 @@ import (
 	"io"
 	"bytes"
 	"net/url"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestItCreateLoginRequest(t *testing.T) {
@@ -20,20 +22,13 @@ func TestItCreateLoginRequest(t *testing.T) {
 }
 
 func checkHeadersOrFail(header http.Header, t *testing.T) {
-	if val, ok := header["Accept"]; ok == false || len(val) != 1 || val[0] != "application/json" {
-		t.Error("Expected header: Accept: \"application/json\" got", val)
-		t.FailNow()
-	}
 
-	if val, ok := header["Content-Type"]; ok == false || len(val) != 1 || val[0] != "application/x-www-form-urlencoded" {
-		t.Error("Expected header: Accept: \"application/x-www-form-urlencoded\" got", val)
-		t.FailNow()
-	}
+	headerExpected := http.Header{}
+	headerExpected.Add("Accept", "application/json")
+	headerExpected.Add("Content-Type", "application/x-www-form-urlencoded")
+	headerExpected.Add("X-Application", "12345AppKey")
 
-	if val, ok := header["X-Application"]; ok == false || len(val) != 1 || val[0] != "12345AppKey" {
-		t.Error("Expected header: Accept: \"application/x-www-form-urlencoded\" \ngot", val)
-		t.FailNow()
-	}
+	assert.ObjectsAreEqual(headerExpected, header)
 }
 
 func checkBodyOrFail(body io.ReadCloser, t *testing.T) {
@@ -41,22 +36,14 @@ func checkBodyOrFail(body io.ReadCloser, t *testing.T) {
 	buf.ReadFrom(body)
 	bodyRequest := buf.String()
 
-	if(bodyRequest!= "username=daniele&password=dangeli") {
-		t.Error("Expected body: username=daniele&password=dangeli \n Got: ", bodyRequest)
-		t.FailNow()
-	}
+	assert.Equal(t, "username=daniele&password=dangeli", bodyRequest)
+
 }
 
 func checkMethodOrFail(method string, t *testing.T) {
-	if(method != "POST") {
-		t.Error("expected HTTP method: POST \n got:", method)
-		t.FailNow();
-	}
+	assert.Equal(t, "POST", method)
 }
 
 func checkUrlOrFail(url *url.URL, t *testing.T) {
-	if(url.String() != "www.login.com") {
-		t.Error("expected HTTP url: www.login.com/auth \n got:", url.String())
-		t.FailNow();
-	}
+	assert.Equal(t, "www.login.com", url.String())
 }

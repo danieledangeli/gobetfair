@@ -6,80 +6,64 @@ import (
 	"github.com/danieledangeli/gobetfair/httpio"
 	"github.com/danieledangeli/gobetfair/credential"
 	"strings"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestItLoginAndCreatesAToken(t *testing.T) {
-	httpIO := &MockHttpIo{}
+	req, _ := http.NewRequest("POST", "www.test.it", strings.NewReader("body"))
+	resp := httpio.BetfairLoginResponse{"superSecret", "", "200", ""}
 
-	httpIO.DoRequestFunc = (func(request *http.Request) httpio.BetfairResponse {
-		betfairResponse := httpio.BetfairLoginResponse{"superSecret", "150", "200", ""}
-		return betfairResponse;
-	})
+	brf := new(MockBetfairRequestFactory)
+	brf.On("CreateLoginRequest", "username", "password", "key", "www.login.com").Return(req)
 
-	brf := &MockBetfairRequestFactory{}
-	brf.CreateLoginRequestFunc = (func(username string, password string, applicationKey string, urlEndpoint string) (*http.Request) {
-		req, _ := http.NewRequest("POST", "www.test.it", strings.NewReader("body"))
-		return req
-	})
+	httpIO := new(MockHttpIo)
+	httpIO.On("DoRequest", req).Return(resp)
 
 	sessionService := SessionService{brf: brf, httpio: httpIO}
 
 	credential := credential.Credential{"username", "password", "key"}
-	session, err := sessionService.Login(credential, "wwwwww.login.com")
+	session, err := sessionService.Login(credential, "www.login.com")
 
-	if err != nil {
-		t.Error("not expected error", err)
-		t.FailNow()
-	}
-
-	if session.Token != "superSecret" {
-		t.Error("not expected session", session)
-		t.FailNow()
-	}
+	assert.Nil(t, err)
+	assert.Equal(t, "superSecret", session.Token)
 }
 
 func TestItReturnErrorIdLoginResponseHasErrors(t *testing.T) {
-	httpIO := &MockHttpIo{}
+	req, _ := http.NewRequest("POST", "www.test.it", strings.NewReader("body"))
+	resp := httpio.BetfairLoginResponse{"", "", "400", "an error"}
 
-	httpIO.DoRequestFunc = (func(request *http.Request) httpio.BetfairResponse {
-		betfairResponse := httpio.BetfairLoginResponse{"", "", "400", "an error"}
-		return betfairResponse;
-	})
+	brf := new(MockBetfairRequestFactory)
+	brf.On("CreateLoginRequest", "username", "password", "key", "www.login.com").Return(req)
 
-	brf := &MockBetfairRequestFactory{}
-	brf.CreateLoginRequestFunc = (func(username string, password string, applicationKey string, urlEndpoint string) (*http.Request) {
-		req, _ := http.NewRequest("POST", "www.test.it", strings.NewReader("body"))
-		return req
-	})
+	httpIO := new(MockHttpIo)
+	httpIO.On("DoRequest", req).Return(resp)
 
 	sessionService := SessionService{brf: brf, httpio: httpIO}
 
 	credential := credential.Credential{"username", "password", "key"}
-	session, err := sessionService.Login(credential, "wwww.login.com")
+	_, err := sessionService.Login(credential, "www.login.com")
 
-	if err == nil {
-		t.Error("Expected return error, got session", session)
-		t.FailNow()
-	}
-
-	if(err.Error() != "Betfair response error: an error") {
-		t.Error("Assert response Error: \nExpected Error message\n", "Betfair response error: an error", "\nActual:\n",err.Error())
-		t.FailNow()
-	}
+	assert.NotNil(t, err)
+	assert.Equal(t, "Betfair response error: an error", err.Error())
 }
 
-type MockHttpIo struct {
-	DoRequestFunc func(request *http.Request) httpio.BetfairResponse
+type MockHttpIo struct{
+	mock.Mock
+}
+
+func (m *MockHttpIo) DoRequest(request *http.Request) httpio.BetfairResponse {
+	args := m.Called(request)
+	return args.Get(0).(httpio.BetfairResponse)
+
 }
 
 type MockBetfairRequestFactory struct {
-	CreateLoginRequestFunc func(username string, password string, applicationKey string, urlEndpoint string) (*http.Request)
+	mock.Mock
 }
 
 func (s *MockBetfairRequestFactory) CreateLoginRequest(username string, password string, applicationKey string, urlEndpoint string)(*http.Request) {
-	return s.CreateLoginRequestFunc(username, password, applicationKey, urlEndpoint)
+	args := s.Called(username, password, applicationKey, urlEndpoint)
+	return args.Get(0).(*http.Request)
 }
 
-func (h *MockHttpIo) DoRequest(request *http.Request) httpio.BetfairResponse {
-	return h.DoRequestFunc(request)
-}
